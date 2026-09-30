@@ -1,6 +1,8 @@
+import { Link } from 'react-router-dom';
+
 function Hero() {
   return (
-    <section className="position-relative overflow-hidden" style={{ height: '75vh' }}>
+    <section className="position-relative overflow-hidden" style={{ height: '100vh', minHeight: '560px' }}>
       <video
         autoPlay
         loop
@@ -38,21 +40,23 @@ function Hero() {
         {/* This inner block centers the two lines relative to EACH OTHER,
             while the outer block above keeps the same right-side position as before */}
         <div className="d-flex flex-column align-items-center text-center">
-          <h1 className="mb-2" style={{ fontFamily: "'Merriweather', serif", color: '#FFFFFF', fontWeight: 700, letterSpacing: '0.1em' }}>
+          <h1 className="hero-title text-gold-metallic mb-2" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 500, letterSpacing: '0.18em', fontSize: 'clamp(2.4rem, 6vw, 4.5rem)' }}>
             TS MODE
           </h1>
+          <hr className="gold-rule" />
           <p
-            className="mb-0"
+            className="mb-4"
             style={{
               color: '#FDF0A6',
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Playfair Display', serif",
               fontStyle: 'italic',
-              letterSpacing: '0.1em',
-              fontSize: '1.2rem',
+              letterSpacing: '0.12em',
+              fontSize: '1.15rem',
             }}
           >
             Élégance • Style • Féminité
           </p>
+          <Link to="/products" className="btn btn-outline-gold on-dark">Shop the Collection</Link>
         </div>
       </div>
     </section>

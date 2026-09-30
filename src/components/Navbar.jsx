@@ -1,18 +1,31 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { getLeafCategories } from '../services/api';
 import { useCart } from '../context/CartContext';
 
 function Navbar() {
   const [leafCategories, setLeafCategories] = useState([]);
   const { totalItems } = useCart();
+  const { pathname } = useLocation();
+  const isHome = pathname === '/';
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const transparent = isHome && !scrolled;
 
   useEffect(() => {
   getLeafCategories().then(setLeafCategories).catch(() => {});
   }, []);
 
   return (
-    <nav className="navbar navbar-expand-lg bg-light text-uppercase fs-6 p-3 border-bottom align-items-center">
+    <>
+    <nav className={`navbar navbar-expand-lg navbar-ts text-uppercase fs-6 p-3 align-items-center ${transparent ? 'is-top' : ''}`}>
       <div className="container-fluid">
         <div className="row justify-content-between align-items-center w-100">
 
@@ -104,6 +117,8 @@ function Navbar() {
         </div>
       </div>
     </nav>
+    {!isHome && <div className="nav-spacer" />}
+    </>
   );
 }
 

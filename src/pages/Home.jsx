@@ -20,7 +20,8 @@ function Home() {
       <Hero />
       <SubcategoryGrid />
       <div className="container py-4">
-        <h3 className="text-uppercase mb-4">All Products</h3>
+        <h3 className="section-heading mb-0">The Collection</h3>
+        <hr className="gold-rule" />
         {loading ? (
           <p>Loading...</p>
         ) : (

@@ -25,7 +25,8 @@ function ProductsPage() {
 
   return (
     <div className="container py-4">
-      <h2 className="text-uppercase mb-4">Products</h2>
+      <h2 className="section-heading mb-0">Products</h2>
+      <hr className="gold-rule" />
       <div className="row">
         <div className="col-md-3 mb-4">
           <h6 className="text-uppercase mb-3">Categories</h6>
