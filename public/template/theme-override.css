@@ -1,0 +1,248 @@
+:root {
+  --heading-font: "Merriweather", serif;
+  --bs-body-font-family: "Merriweather", serif;
+  --bs-body-font-size: 15px;
+  --bs-body-font-weight: 600;
+  --bs-body-color: #633e15;
+  --heading-color: #633e15;
+
+  --bs-primary: #c89b48;
+  --bs-primary-rgb: 200, 155, 72;
+  --bs-black: #633e15;
+  --bs-black-rgb: 99, 62, 21;
+  --bs-light: #ffffff;
+  --bs-link-color: #633e15;
+  --bs-link-hover-color: #c89b48;
+}
+
+* {
+  font-family: "Merriweather", serif !important;
+}
+
+body,
+p,
+span,
+li,
+a,
+label,
+input,
+button,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700 !important;
+}
+
+.btn {
+  font-weight: 700 !important;
+}
+
+body {
+  background: #ffffff;
+}
+
+/* Smaller, calmer heading scale */
+h1,
+.h1 {
+  font-size: 2.5rem;
+}
+h2,
+.h2 {
+  font-size: 2rem;
+}
+h3,
+.h3 {
+  font-size: 1.6rem;
+}
+h4,
+.h4 {
+  font-size: 1.25rem;
+}
+h5,
+.h5 {
+  font-size: 1rem;
+}
+h6,
+.h6 {
+  font-size: 0.85rem;
+}
+
+.element-title,
+.navbar-brand,
+.section-title {
+  font-family: var(--heading-font);
+  color: #633e15;
+}
+
+/* Ghost button style, matching the gold palette */
+.btn-primary {
+  --bs-btn-color: #633e15;
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: #c89b48;
+  --bs-btn-hover-color: #633e15;
+  --bs-btn-hover-bg: #fdf0a6;
+  --bs-btn-hover-border-color: #c89b48;
+  --bs-btn-active-bg: #fdf0a6;
+  --bs-btn-active-border-color: #c89b48;
+  border-width: 1px;
+  letter-spacing: 0.05em;
+}
+
+.btn-dark {
+  --bs-btn-bg: #633e15;
+  --bs-btn-border-color: #633e15;
+  --bs-btn-hover-bg: #c89b48;
+  --bs-btn-hover-border-color: #c89b48;
+}
+
+.text-primary {
+  color: #c89b48 !important;
+}
+.text-danger {
+  color: #633e15 !important;
+}
+
+/* Slightly tighter product card typography */
+.product-content h5 {
+  font-size: 0.95rem;
+}
+
+.navbar {
+  --bs-body-font-size: 0.75rem;
+}
+
+/* Rounded corners, everywhere */
+.btn,
+.form-control,
+.card,
+.product-item .image-holder,
+.product-item img,
+input,
+select,
+textarea {
+  border-radius: 10px !important;
+}
+
+.btn {
+  transition: all 0.25s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+/* Product cards: rounded image + soft shadow + lift on hover */
+.product-item {
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.product-item:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(99, 62, 21, 0.12);
+}
+
+.product-item .image-holder img {
+  border-radius: 12px 12px 0 0 !important;
+  transition: transform 0.4s ease;
+}
+
+/* Category grid images */
+.category-grid-item {
+  border-radius: 14px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.category-grid-item:hover {
+  transform: scale(1.03);
+}
+
+/* Fade-in on load, applied via a shared class */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+/* Stagger children for a nicer grid entrance */
+.fade-in-stagger > * {
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.fade-in-stagger > *:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.fade-in-stagger > *:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.fade-in-stagger > *:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.fade-in-stagger > *:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.fade-in-stagger > *:nth-child(5) {
+  animation-delay: 0.25s;
+}
+.fade-in-stagger > *:nth-child(6) {
+  animation-delay: 0.3s;
+}
+.fade-in-stagger > *:nth-child(7) {
+  animation-delay: 0.35s;
+}
+.fade-in-stagger > *:nth-child(8) {
+  animation-delay: 0.4s;
+}
+
+/* Links get a smooth underline sweep instead of a hard color flip */
+a {
+  transition: color 0.25s ease;
+}
+
+/* Nav dropdown: subtle open animation */
+.dropdown-menu {
+  border-radius: 10px !important;
+  box-shadow: 0 8px 20px rgba(99, 62, 21, 0.1);
+  border: 1px solid #fdf0a6 !important;
+}
+
+.element-title,
+.section-title,
+h1,
+h2,
+h3 {
+  letter-spacing: 0.02em;
+}
+
+.navbar-brand {
+  font-size: 1.4rem;
+  letter-spacing: 0.05em;
+}
+
+/* Tighter section spacing overall */
+section,
+.container.py-5 {
+  padding-top: 2.5rem !important;
+  padding-bottom: 2.5rem !important;
+}
+
+.row.g-4 {
+  --bs-gutter-x: 1.25rem;
+  --bs-gutter-y: 1.25rem;
+}
