@@ -1,69 +1,44 @@
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import QuantityInput from '../components/QuantityInput';
 
 function CartPage() {
   const { items, removeFromCart, updateQuantity, totalPrice } = useCart();
 
   if (items.length === 0) {
     return (
-      <div className="container mt-5 text-center">
-        <h2>Your cart is empty</h2>
-        <Link to="/" className="btn btn-primary mt-3">Continue Shopping</Link>
+      <div className="container py-5 text-center">
+        <h2 className="section-heading mb-0">Your cart is empty</h2>
+        <hr className="gold-rule" />
+        <Link to="/products" className="btn btn-outline-gold">Continue Shopping</Link>
       </div>
     );
   }
 
   return (
-    <div className="container mt-5">
-      <h2 className="mb-4">Your Cart</h2>
-      <table className="table align-middle">
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Options</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item, index) => (
-            <tr key={index}>
-              <td>
-                <div className="d-flex align-items-center gap-2">
-                  <img src={item.image} alt={item.name} style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
-                  {item.name}
-                </div>
-              </td>
-              <td>
-                {Object.entries(item.attributes).map(([key, value]) => (
-                  <span key={key} className="me-2">{key}: {value}</span>
-                ))}
-              </td>
-              <td>
-                <input
-                  type="number"
-                  min="1"
-                  value={item.quantity}
-                  onChange={e => updateQuantity(item.productId, item.attributes, Math.max(1, parseInt(e.target.value) || 1))}
-                  className="form-control"
-                  style={{ width: '70px' }}
-                />
-              </td>
-              <td>{item.unitPrice * item.quantity} DA</td>
-              <td>
-                <button className="btn btn-outline-danger btn-sm" onClick={() => removeFromCart(item.productId, item.attributes)}>
-                  Remove
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="container py-5" style={{ maxWidth: 860 }}>
+      <h2 className="section-heading mb-0">Your Cart</h2>
+      <hr className="gold-rule" />
 
-      <div className="text-end">
-        <h4>Total: {totalPrice} DA</h4>
-        <Link to="/checkout" className="btn btn-dark btn-lg mt-3">Proceed to Checkout</Link>
+      {items.map((item) => (
+        <div className="cart-row" key={item.productId + JSON.stringify(item.attributes)}>
+          <img src={item.image} alt={item.name} />
+          <div className="cart-info">
+            <div className="cart-name">{item.name}</div>
+            <div className="cart-options">
+              {Object.entries(item.attributes || {}).map(([k, v]) => `${k}: ${v}`).join(' · ')}
+            </div>
+            <div className="cart-unit">{item.unitPrice} DA</div>
+          </div>
+          <QuantityInput value={item.quantity} onChange={(q) => updateQuantity(item.productId, item.attributes, q)} />
+          <div className="cart-line">{item.unitPrice * item.quantity} DA</div>
+          <button className="cart-remove" aria-label="Remove" onClick={() => removeFromCart(item.productId, item.attributes)}>×</button>
+        </div>
+      ))}
+
+      <div className="text-end mt-4">
+        <div className="fs-4 mb-3">Total: <strong>{totalPrice} DA</strong></div>
+        <Link to="/checkout" className="btn btn-outline-gold">Proceed to Checkout</Link>
       </div>
     </div>
   );

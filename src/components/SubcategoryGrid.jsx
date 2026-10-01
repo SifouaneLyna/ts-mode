@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getLeafCategories } from '../services/api';
+import Reveal from './Reveal';
 
 function SubcategoryGrid() {
   const [categories, setCategories] = useState([]);
@@ -13,23 +14,21 @@ function SubcategoryGrid() {
 
   return (
     <section className="container py-4">
-      <h3 className="text-center text-uppercase mb-4">Shop by Category</h3>
+      <h3 className="section-heading mb-0">Shop by Category</h3>
+      <hr className="gold-rule" />
       <div className="row g-4">
-        {categories.map(cat => (
+        {categories.map((cat, i) => (
           <div className="col-6 col-md-3" key={cat._id}>
-            <Link to={`/products?category=${cat._id}`} className="text-decoration-none">
-              <div className="text-center">
-                <div
-                  style={{
-                    height: '200px',
-                    backgroundImage: `url(${cat.imageUrl || '/template/images/cat-item1.jpg'})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                  }}
-                ></div>
-                <h5 className="mt-3 text-uppercase">{cat.name}</h5>
+            <Reveal delay={(i % 4) * 80}>
+            <Link to={`/products?category=${cat._id}`} className="cat-card">
+              <div className="cat-card-img" style={{ backgroundImage: `url(${cat.imageUrl || '/template/images/cat-item1.jpg'})` }} />
+              <div className="cat-card-shade" />
+              <div className="cat-card-label">
+                <h5>{cat.name}</h5>
+                <span>Discover</span>
               </div>
             </Link>
+            </Reveal>
           </div>
         ))}
       </div>

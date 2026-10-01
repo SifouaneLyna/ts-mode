@@ -8,54 +8,37 @@ function ProductCard({ product }) {
   const finalPrice = product.onSale
     ? Math.round(product.basePrice * (1 - product.salePercentage / 100))
     : product.basePrice;
-
   const imageUrl = product.images?.[0] || '/template/images/product-item-1.jpg';
+  const soldOut = !product.hasVariants && !(product.stockQty > 0);
+  const url = `/product/${product._id}`;
 
   function handleAddToCart(e) {
     e.preventDefault();
-
-    if (product.hasVariants) {
-      // Can't add directly without knowing which variant — send them to pick one
-      navigate(`/product/${product._id}`);
-      return;
-    }
-
-    if (product.stockQty > 0) {
-      addToCart(product, {}, 1, finalPrice);
-    }
+    if (product.hasVariants) { navigate(url); return; } // needs a variant choice
+    if (!soldOut) addToCart(product, {}, 1, finalPrice);
   }
 
   return (
-    <div className="product-item image-zoom-effect link-effect">
-      <div className="image-holder position-relative">
-        <Link to={`/product/${product._id}`}>
-          <img
-              src={imageUrl}
-              alt={product.name}
-              className="product-image img-fluid"
-              style={{ width: '100%', height: '260px', objectFit: 'cover' }}
-          />
+    <article className="pcard">
+      <div className="pcard-top">
+        <Link to={url} className="pcard-media" aria-label={product.name}>
+          <img src={imageUrl} alt={product.name} loading="lazy" />
+          <span className="pcard-shade" />
         </Link>
-        <a href="#" className="btn-icon btn-wishlist">
-          <svg width="24" height="24" viewBox="0 0 24 24"><use href="#heart"></use></svg>
-        </a>
-        <div className="product-content">
-          <h5 className="element-title text-uppercase mt-3">
-            <Link to={`/product/${product._id}`}>{product.name}</Link>
-          </h5>
-          {product.onSale ? (
-            <a href="#" className="text-decoration-none" data-after="Add to cart" onClick={handleAddToCart}>
-              <span className="text-decoration-line-through text-muted me-2">{product.basePrice} DA</span>
-              <span>{finalPrice} DA</span>
-            </a>
-          ) : (
-            <a href="#" className="text-decoration-none" data-after="Add to cart" onClick={handleAddToCart}>
-              <span>{product.basePrice} DA</span>
-            </a>
-          )}
+        {product.onSale && <span className="pcard-badge">-{product.salePercentage}%</span>}
+        {soldOut && <span className="pcard-badge pcard-badge-dark">Sold out</span>}
+        <button type="button" className="pcard-add" onClick={handleAddToCart} disabled={soldOut}>
+          {product.hasVariants ? 'Choose options' : soldOut ? 'Sold out' : 'Add to cart'}
+        </button>
+      </div>
+      <div className="pcard-body">
+        <h5 className="pcard-name"><Link to={url}>{product.name}</Link></h5>
+        <div className="pcard-price">
+          {product.onSale && <span className="pcard-old">{product.basePrice} DA</span>}
+          <span>{finalPrice} DA</span>
         </div>
       </div>
-    </div>
+    </article>
   );
 }
 
