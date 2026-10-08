@@ -3,6 +3,10 @@ import { useParams } from 'react-router-dom';
 import { getProductById } from '../services/api';
 import { useCart } from '../context/CartContext';
 import QuantityInput from '../components/QuantityInput';
+import { img } from '../utils/img';
+import { loc } from '../utils/localize';
+import { useI18n } from '../i18n/I18nContext';
+import { useAttr } from '../context/SiteSettingsContext';
 
 function ProductDetail() {
   const { productId } = useParams();
@@ -13,6 +17,8 @@ function ProductDetail() {
   const [added, setAdded] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const { addToCart } = useCart();
+  const { t, money, lang } = useI18n();
+  const attr = useAttr();
 
   useEffect(() => {
     getProductById(productId)
@@ -21,8 +27,8 @@ function ProductDetail() {
       .finally(() => setLoading(false));
   }, [productId]);
 
-  if (loading) return <p className="container mt-5">Loading...</p>;
-  if (!product) return <p className="container mt-5">Product not found.</p>;
+  if (loading) return <p className="container mt-5">{t('common.loading')}</p>;
+  if (!product) return <p className="container mt-5">{t('pd.notFound')}</p>;
 
   const finalPrice = product.onSale
     ? Math.round(product.basePrice * (1 - product.salePercentage / 100))
@@ -34,14 +40,15 @@ function ProductDetail() {
     : [];
 
   // Get the distinct values available for one attribute key (e.g. all colors)
+  const canon = (value) => attr.canonical(value);
   function getOptionsFor(key) {
-    return [...new Set(product.variants.map(v => v.attributes[key]))];
+    return [...new Set(product.variants.map(v => canon(v.attributes[key])))];
   }
 
   // Find the specific variant matching everything currently selected
   const matchedVariant = product.hasVariants
     ? product.variants.find(v =>
-        attributeKeys.every(key => v.attributes[key] === selectedAttributes[key])
+        attributeKeys.every(key => canon(v.attributes[key]) === selectedAttributes[key])
       )
     : null;
 
@@ -51,11 +58,13 @@ function ProductDetail() {
     : product.stockQty;
 
   function handleAddToCart() {
-    addToCart(product, product.hasVariants ? selectedAttributes : {}, Math.min(quantity, availableStock), finalPrice);
+    // the cart keeps the values exactly as stored on the variant (the server matches on them)
+    addToCart(product, product.hasVariants ? { ...matchedVariant.attributes } : {}, Math.min(quantity, availableStock), finalPrice);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }
 
+  const soldOut = availableStock === 0 && (!product.hasVariants || allAttributesSelected);
   const canAddToCart = product.hasVariants
     ? allAttributesSelected && availableStock > 0
     : availableStock > 0;
@@ -68,34 +77,35 @@ function ProductDetail() {
     <div className="container py-5">
       <div className="row g-5">
         <div className="col-md-6">
-          <img src={mainImage} alt={product.name} className="pd-image" />
+          <img src={img(mainImage, 1400, 'best')} alt={loc(product, 'name', lang)} className="pd-image" decoding="async" />
           {gallery.length > 1 && (
             <div className="pd-thumbs">
-              {gallery.map((img, i) => (
-                <img key={img + i} src={img} alt="" className={img === mainImage ? 'active' : ''} onClick={() => setActiveImage(i)} />
+              {gallery.map((url, i) => (
+                <img key={url + i} src={img(url, 300, 'good')} alt="" className={url === mainImage ? 'active' : ''} onClick={() => setActiveImage(i)} />
               ))}
             </div>
           )}
         </div>
 
         <div className="col-md-6">
-          <h1 className="pd-title">{product.name}</h1>
+          <h1 className="pd-title">{loc(product, 'name', lang)}</h1>
           <hr className="gold-rule ms-0" />
           <div className="pd-price">
             {product.onSale ? (
               <>
-                <span className="pd-old">{product.basePrice} DA</span>
-                <span>{finalPrice} DA</span>
+                <span className="pd-old">{money(product.basePrice)}</span>
+                <span>{money(finalPrice)}</span>
+                <span className="pd-badge">-{product.salePercentage}%</span>
               </>
             ) : (
-              <span>{product.basePrice} DA</span>
+              <span>{money(product.basePrice)}</span>
             )}
           </div>
-          <p className="pd-desc">{product.description}</p>
+          <p className="pd-desc">{loc(product, 'description', lang)}</p>
 
           {attributeKeys.map((key) => (
             <div key={key} className="mb-4">
-              <div className="pd-label">{key}</div>
+              <div className="pd-label">{attr.name(key)}</div>
               <div className="d-flex gap-2 flex-wrap">
                 {getOptionsFor(key).map((value) => (
                   <button
@@ -104,7 +114,7 @@ function ProductDetail() {
                     className={`opt-btn ${selectedAttributes[key] === value ? 'selected' : ''}`}
                     onClick={() => { setSelectedAttributes((prev) => ({ ...prev, [key]: value })); setActiveImage(0); }}
                   >
-                    {value}
+                    {attr.value(value)}
                   </button>
                 ))}
               </div>
@@ -112,12 +122,12 @@ function ProductDetail() {
           ))}
 
           <div className="mb-4">
-            <div className="pd-label">Quantity</div>
+            <div className="pd-label">{t('pd.quantity')}</div>
             <QuantityInput value={quantity} onChange={setQuantity} max={availableStock > 0 ? availableStock : undefined} />
           </div>
 
-          <button className="btn btn-outline-gold w-100" disabled={!canAddToCart} onClick={handleAddToCart}>
-            {added ? 'Added!' : product.hasVariants && !allAttributesSelected ? 'Select options' : availableStock === 0 ? 'Out of stock' : 'Add to Cart'}
+          <button className={`btn btn-outline-gold w-100 ${soldOut ? 'is-soldout' : ''}`} disabled={!canAddToCart} onClick={handleAddToCart}>
+            {added ? t('pd.added') : product.hasVariants && !allAttributesSelected ? t('pd.selectOptions') : soldOut ? t('pd.outOfStock') : t('pd.add')}
           </button>
         </div>
       </div>

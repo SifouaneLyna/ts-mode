@@ -1,8 +1,13 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useI18n } from '../i18n/I18nContext';
+import { img } from '../utils/img';
+import { loc } from '../utils/localize';
 
 function ProductCard({ product }) {
   const { addToCart } = useCart();
+  const { t, money, lang } = useI18n();
+  const name = loc(product, 'name', lang);
   const navigate = useNavigate();
 
   const finalPrice = product.onSale
@@ -21,21 +26,21 @@ function ProductCard({ product }) {
   return (
     <article className="pcard">
       <div className="pcard-top">
-        <Link to={url} className="pcard-media" aria-label={product.name}>
-          <img src={imageUrl} alt={product.name} loading="lazy" />
+        <Link to={url} className="pcard-media" aria-label={name}>
+          <img src={img(imageUrl, 800)} alt={name} loading="lazy" decoding="async" />
           <span className="pcard-shade" />
         </Link>
-        {product.onSale && <span className="pcard-badge">-{product.salePercentage}%</span>}
-        {soldOut && <span className="pcard-badge pcard-badge-dark">Sold out</span>}
+        {product.onSale && <span className="pcard-badge sale">-{product.salePercentage}%</span>}
+        {soldOut && <span className="pcard-badge pcard-badge-dark">{t('product.soldOut')}</span>}
         <button type="button" className="pcard-add" onClick={handleAddToCart} disabled={soldOut}>
-          {product.hasVariants ? 'Choose options' : soldOut ? 'Sold out' : 'Add to cart'}
+          {product.hasVariants ? t('product.options') : soldOut ? t('product.soldOut') : t('product.add')}
         </button>
       </div>
       <div className="pcard-body">
-        <h5 className="pcard-name"><Link to={url}>{product.name}</Link></h5>
+        <h5 className="pcard-name"><Link to={url}>{name}</Link></h5>
         <div className="pcard-price">
-          {product.onSale && <span className="pcard-old">{product.basePrice} DA</span>}
-          <span>{finalPrice} DA</span>
+          {product.onSale && <span className="pcard-old">{money(product.basePrice)}</span>}
+          <span>{money(finalPrice)}</span>
         </div>
       </div>
     </article>

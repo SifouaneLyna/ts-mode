@@ -4,8 +4,10 @@ import ProductCard from '../components/ProductCard';
 import Reveal from '../components/Reveal';
 import Hero from '../components/Hero';
 import SubcategoryGrid from '../components/SubcategoryGrid';
+import { useI18n } from '../i18n/I18nContext';
 
 function Home() {
+  const { t } = useI18n();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -27,19 +29,19 @@ function Home() {
       <Hero />
       <SubcategoryGrid />
       <div className="container py-4">
-        <h3 className="section-heading mb-0">The Collection</h3>
+        <h3 className="section-heading mb-0">{t('home.collection')}</h3>
         <hr className="gold-rule" />
         {loading ? (
           <p className="text-center text-muted">
-            Loading…{slow && ' the server is waking up, this can take up to a minute.'}
+            {t('common.loading')}{slow && ` ${t('common.waking')}`}
           </p>
         ) : error ? (
           <div className="text-center">
-            <p className="text-muted">We couldn't load the products.</p>
-            <button className="btn btn-outline-gold" onClick={() => { setLoading(true); setAttempt((n) => n + 1); }}>Try again</button>
+            <p className="text-muted">{t('home.loadError')}</p>
+            <button className="btn btn-outline-gold" onClick={() => { setLoading(true); setAttempt((n) => n + 1); }}>{t('home.retry')}</button>
           </div>
         ) : products.length === 0 ? (
-          <p className="text-center text-muted">No products yet.</p>
+          <p className="text-center text-muted">{t('home.empty')}</p>
         ) : (
           <div className="row g-4">
             {products.map((product, i) => (

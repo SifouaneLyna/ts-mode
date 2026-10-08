@@ -1,9 +1,23 @@
 import { Link } from 'react-router-dom';
+import { useI18n } from '../i18n/I18nContext';
+import { useSiteSettings } from '../context/SiteSettingsContext';
+import { videoPoster, videoUrl } from '../utils/img';
+
+const DEFAULT_VIDEO = '/template/videos/hero-video.mp4';
 
 function Hero() {
+  const { t } = useI18n();
+  const custom = useSiteSettings().heroVideo;
+  const phone = typeof window !== 'undefined' && window.innerWidth <= 768;
+  const src = custom ? videoUrl(custom) : DEFAULT_VIDEO;
+  const poster = custom ? videoPoster(custom, phone ? 800 : 1280) : undefined;
   return (
-    <section className="position-relative overflow-hidden" style={{ height: '100vh', minHeight: '560px' }}>
+    <section className="position-relative overflow-hidden" style={{ height: '100vh', minHeight: '560px', background: '#2b1c0b' }}>
       <video
+        key={src}
+        src={src}
+        poster={poster}
+        preload="auto"
         autoPlay
         loop
         muted
@@ -17,25 +31,23 @@ function Hero() {
           objectFit: 'cover',
           zIndex: 0,
         }}
-      >
-        <source src="/template/videos/hero-video.mp4" type="video/mp4" />
-      </video>
+      />
 
       <div
         style={{
           position: 'absolute',
           top: 0,
-          right: 0,
+          insetInlineEnd: 0,
           width: '55%',
           height: '100%',
-          background: 'linear-gradient(to left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%)',
+          background: 'linear-gradient(to var(--shade-dir, left), rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%)',
           zIndex: 1,
         }}
       ></div>
 
       <div
         className="position-relative h-100 d-flex flex-column align-items-end justify-content-center fade-in"
-        style={{ zIndex: 2, paddingRight: '8%', paddingLeft: '20%' }}
+        style={{ zIndex: 2, paddingInlineEnd: '8%', paddingInlineStart: '20%' }}
       >
         {/* This inner block centers the two lines relative to EACH OTHER,
             while the outer block above keeps the same right-side position as before */}
@@ -48,15 +60,15 @@ function Hero() {
             className="mb-4"
             style={{
               color: '#FDF0A6',
-              fontFamily: "'Playfair Display', serif",
+              fontFamily: 'var(--heading-font)',
               fontStyle: 'italic',
               letterSpacing: '0.12em',
               fontSize: '1.15rem',
             }}
           >
-            Élégance • Style • Féminité
+            {t('hero.tagline')}
           </p>
-          <Link to="/products" className="btn btn-outline-gold on-dark">Shop the Collection</Link>
+          <Link to="/products" className="btn btn-outline-gold on-dark">{t('hero.cta')}</Link>
         </div>
       </div>
     </section>

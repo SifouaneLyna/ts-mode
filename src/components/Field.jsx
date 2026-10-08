@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useI18n } from '../i18n/I18nContext';
 
 // Labeled input with inline validation message and optional show/hide for passwords.
 function Field({ label, error, type = 'text', className = 'mb-3', ...props }) {
+  const { t } = useI18n();
   const [visible, setVisible] = useState(false);
   const isPassword = type === 'password';
   return (
@@ -15,7 +17,7 @@ function Field({ label, error, type = 'text', className = 'mb-3', ...props }) {
         />
         {isPassword && (
           <button type="button" className="field-toggle" onClick={() => setVisible(!visible)} tabIndex={-1}>
-            {visible ? 'Hide' : 'Show'}
+            {visible ? t('common.hide') : t('common.show')}
           </button>
         )}
       </div>

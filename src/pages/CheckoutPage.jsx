@@ -5,9 +5,14 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { isValidPhone, cleanPhone } from '../utils/validators';
 import { saveGuestOrder } from '../utils/guestOrders';
+import { useI18n } from '../i18n/I18nContext';
+import { useAttr } from '../context/SiteSettingsContext';
+import { loc } from '../utils/localize';
 
 function CheckoutPage() {
   const { token, user, logout } = useAuth();
+  const { t, errorText, money, lang } = useI18n();
+  const attr = useAttr();
   const { items, totalPrice, clearCart } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
@@ -22,25 +27,26 @@ function CheckoutPage() {
   const [order, setOrder] = useState(null);
 
   useEffect(() => {
-    getDeliveryRates().then(setRates).catch(() => setError('Could not load delivery prices.'));
+    getDeliveryRates().then(setRates).catch(() => setError('__rates'));
   }, []);
 
   if (order) {
     return (
       <div className="container py-5 text-center" style={{ maxWidth: 560 }}>
-        <h2 className="section-heading mb-0">Thank you</h2>
+        <h2 className="section-heading mb-0">{t('checkout.thanks')}</h2>
         <hr className="gold-rule" />
-        <p>Your order <strong>#{order.orderNumber || order._id.slice(-6).toUpperCase()}</strong> was placed. Payment is in cash on delivery.</p>
-        <p>Items: {order.itemsTotal} DA · Delivery: {order.deliveryPrice} DA<br /><strong>Total: {order.totalPrice} DA</strong></p>
+        <p>{t('checkout.placed', { ref: order.orderNumber || order._id.slice(-6).toUpperCase() })}</p>
+        <p>{t('checkout.items')}: {money(order.itemsTotal)} · {t('checkout.delivery')}: {money(order.deliveryPrice)}<br /><strong>{t('cart.total')}: {money(order.totalPrice)}</strong></p>
         {token ? (
-          <p className="small"><Link to="/profile">Follow this order in your account</Link></p>
+          <p className="small"><Link to="/profile">{t('checkout.followAccount')}</Link></p>
         ) : (
           <p className="small text-muted">
-            Keep your order number and the phone number you used. You can follow or cancel this order any time from{' '}
-            <Link to="/track">Track order</Link>.
+            {t('checkout.guestNote').split('{link}')[0]}
+            <Link to="/track">{t('checkout.trackLink')}</Link>
+            {t('checkout.guestNote').split('{link}')[1]}
           </p>
         )}
-        <Link to="/products" className="btn btn-outline-gold mt-3">Continue Shopping</Link>
+        <Link to="/products" className="btn btn-outline-gold mt-3">{t('cart.continue')}</Link>
       </div>
     );
   }
@@ -51,22 +57,22 @@ function CheckoutPage() {
     const from = { from: '/checkout' };
     return (
       <div className="container py-5" style={{ maxWidth: 820 }}>
-        <h2 className="section-heading mb-0">How would you like to order?</h2>
+        <h2 className="section-heading mb-0">{t('checkout.howTitle')}</h2>
         <hr className="gold-rule" />
         <div className="row g-4">
           <div className="col-md-6">
             <div className="choice-card">
-              <h5>Create an account</h5>
-              <p>Follow your orders, cancel them and check out faster next time. You'll come straight back to checkout.</p>
-              <Link to="/signup" state={from} className="btn btn-outline-gold">Create account</Link>
-              <p className="small mt-3 mb-0">Already have one? <Link to="/login" state={from}>Login</Link></p>
+              <h5>{t('checkout.guest')}</h5>
+              <p>{t('checkout.guestDesc')}</p>
+              <button className="btn btn-outline-gold" onClick={() => setGuest(true)}>{t('checkout.guest')}</button>
             </div>
           </div>
           <div className="col-md-6">
             <div className="choice-card">
-              <h5>Continue as guest</h5>
-              <p>No account needed. You'll get an order number to follow your order with your phone number.</p>
-              <button className="btn btn-outline-gold" onClick={() => setGuest(true)}>Continue as guest</button>
+              <h5>{t('checkout.create')}</h5>
+              <p>{t('checkout.createDesc')}</p>
+              <Link to="/signup" state={from} className="btn btn-outline-gold">{t('checkout.createBtn')}</Link>
+              <p className="small mt-3 mb-0">{t('checkout.haveAccount')} <Link to="/login" state={from}>{t('nav.login')}</Link></p>
             </div>
           </div>
         </div>
@@ -75,9 +81,18 @@ function CheckoutPage() {
   }
 
   const set = (field) => (e) => setForm({ ...form, [field]: e.target.value });
-  const phoneError = !isValidPhone(form.phone) ? 'Enter a valid mobile number (e.g. 0555 12 34 56).' : '';
+  const phoneError = !isValidPhone(form.phone) ? t('v.phone') : '';
   const rate = rates.find((r) => r.wilaya === form.wilaya);
-  const deliveryPrice = rate ? (form.deliveryType === 'home' ? rate.homeDeliveryPrice : rate.officeDeliveryPrice) : null;
+  // an empty price in the admin means "not offered": it can't be chosen
+  const priceOf = (type) => { const p = rate?.[type === 'home' ? 'homeDeliveryPrice' : 'officeDeliveryPrice']; return typeof p === 'number' ? p : null; };
+  const deliveryPrice = rate ? priceOf(form.deliveryType) : null;
+  function chooseWilaya(e) {
+    const wilaya = e.target.value;
+    const r = rates.find((x) => x.wilaya === wilaya);
+    const offered = (type) => typeof r?.[type === 'home' ? 'homeDeliveryPrice' : 'officeDeliveryPrice'] === 'number';
+    const deliveryType = !r || offered(form.deliveryType) ? form.deliveryType : offered('home') ? 'home' : 'office';
+    setForm({ ...form, wilaya, deliveryType });
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -98,7 +113,7 @@ function CheckoutPage() {
         navigate('/login', { state: { from: '/checkout' } });
         return;
       }
-      setError(err.message);
+      setError(err.message || '');
     } finally {
       setLoading(false);
     }
@@ -106,52 +121,52 @@ function CheckoutPage() {
 
   return (
     <div className="container py-5">
-      <h2 className="section-heading mb-0">Checkout</h2>
+      <h2 className="section-heading mb-0">{t('checkout.title')}</h2>
       <hr className="gold-rule" />
       <div className="row g-5">
         <form className="col-lg-7" onSubmit={handleSubmit}>
-          <input className="form-control mb-3" placeholder="Full name" value={form.name} onChange={set('name')} required />
-          <input className={`form-control ${phoneTouched && phoneError ? 'is-invalid' : 'mb-3'}`} placeholder="Phone (0555 12 34 56)" inputMode="tel" value={form.phone}
+          <input className="form-control mb-3" placeholder={t('checkout.fullName')} value={form.name} onChange={set('name')} required />
+          <input className={`form-control ${phoneTouched && phoneError ? 'is-invalid' : 'mb-3'}`} placeholder={t('checkout.phonePh')} inputMode="tel" value={form.phone}
             onChange={set('phone')} onBlur={() => setPhoneTouched(true)} required />
           {phoneTouched && phoneError ? <div className="field-error mb-3">{phoneError}</div> : null}
-          <select className="form-select mb-3" value={form.wilaya} onChange={set('wilaya')} required>
-            <option value="">Wilaya</option>
+          <select className="form-select mb-3" value={form.wilaya} onChange={chooseWilaya} required>
+            <option value="">{t('checkout.wilaya')}</option>
             {rates.map((r) => <option key={r._id} value={r.wilaya}>{r.wilaya}</option>)}
           </select>
-          <input className="form-control mb-3" placeholder="City" value={form.city} onChange={set('city')} required />
+          <input className="form-control mb-3" placeholder={t('checkout.city')} value={form.city} onChange={set('city')} required />
           <div className="mb-3">
-            {[['home', 'Home delivery'], ['office', 'Office pickup']].map(([value, label]) => (
-              <label key={value} className="me-4">
-                <input type="radio" className="form-check-input me-2" name="deliveryType" value={value}
+            {[['home', t('checkout.home')], ['office', t('checkout.office')]].map(([value, label]) => (
+              <label key={value} className={`me-4 ${rate && priceOf(value) === null ? 'is-unavailable' : ''}`}>
+                <input type="radio" className="form-check-input me-2" name="deliveryType" value={value} disabled={Boolean(rate) && priceOf(value) === null}
                   checked={form.deliveryType === value} onChange={set('deliveryType')} />
-                {label}
+                {label}{rate && priceOf(value) === null ? ` (${t('checkout.unavailable')})` : ''}
               </label>
             ))}
           </div>
           {form.deliveryType === 'home' && (
-            <input className="form-control mb-3" placeholder="Address" value={form.address} onChange={set('address')} required />
+            <input className="form-control mb-3" placeholder={t('checkout.address')} value={form.address} onChange={set('address')} required />
           )}
-          {error && <div className="alert alert-danger py-2">{error}</div>}
-          <button className="btn btn-outline-gold" disabled={loading || !rate}>
-            {loading ? 'Placing order…' : 'Place order (cash on delivery)'}
+          {error && <div className="alert alert-danger py-2">{error === '__rates' ? t('checkout.ratesError') : errorText(error)}</div>}
+          <button className="btn btn-outline-gold" disabled={loading || deliveryPrice === null}>
+            {loading ? t('checkout.placing') : t('checkout.place')}
           </button>
         </form>
 
         <aside className="col-lg-5">
-          <h5 className="text-uppercase mb-3">Summary</h5>
+          <h5 className="text-uppercase mb-3">{t('checkout.summary')}</h5>
           {items.map((i, idx) => (
             <div key={idx} className="d-flex justify-content-between small mb-2">
-              <span>{i.name} × {i.quantity} {Object.values(i.attributes || {}).join(' / ')}</span>
-              <span>{i.unitPrice * i.quantity} DA</span>
+              <span>{loc(i, 'name', lang)} × {i.quantity} {attr.joinValues(i.attributes)}</span>
+              <span>{money(i.unitPrice * i.quantity)}</span>
             </div>
           ))}
           <hr />
-          <div className="d-flex justify-content-between"><span>Subtotal</span><span>{totalPrice} DA</span></div>
-          <div className="d-flex justify-content-between"><span>Delivery</span><span>{deliveryPrice === null ? 'Choose a wilaya' : `${deliveryPrice} DA`}</span></div>
+          <div className="d-flex justify-content-between"><span>{t('checkout.subtotal')}</span><span>{money(totalPrice)}</span></div>
+          <div className="d-flex justify-content-between"><span>{t('checkout.delivery')}</span><span>{deliveryPrice === null ? t('checkout.chooseWilaya') : money(deliveryPrice)}</span></div>
           <div className="d-flex justify-content-between fw-bold mt-2">
-            <span>Total</span><span>{deliveryPrice === null ? '—' : `${totalPrice + deliveryPrice} DA`}</span>
+            <span>{t('cart.total')}</span><span>{deliveryPrice === null ? '—' : money(totalPrice + deliveryPrice)}</span>
           </div>
-          <p className="small text-muted mt-3">Final prices are confirmed by the server when you place the order.</p>
+          <p className="small text-muted mt-3">{t('checkout.serverNote')}</p>
         </aside>
       </div>
     </div>

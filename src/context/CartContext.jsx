@@ -30,6 +30,7 @@ export function CartProvider({ children }) {
       return [...prev, {
         productId: product._id,
         name: product.name,
+        translations: product.translations,
         image: product.images?.[0] || '/template/images/product-item-1.jpg',
         attributes,
         quantity,

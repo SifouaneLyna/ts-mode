@@ -1,71 +1,85 @@
 import Reveal from '../components/Reveal';
+import { useI18n } from '../i18n/I18nContext';
+import { useSiteSettings } from '../context/SiteSettingsContext';
+import { socialUrl } from '../utils/social';
+import { FacebookIcon, InstagramIcon, PhoneIcon, PinIcon, TikTokIcon, WhatsAppIcon } from '../components/SocialIcons';
 
-// Fill these in; anything left empty is hidden.
-const CONTACT = {
-  whatsapp: '',   // e.g. '0555 12 34 56' or '+213 555 12 34 56'
-  instagram: '',  // handle (e.g. 'ts_mode') or full profile URL
-  mapQuery: '',   // address, place name, or 'latitude,longitude'
-};
-
-const whatsappDigits = (n) => {
-  const d = n.replace(/\D/g, '');
-  return d.startsWith('0') ? `213${d.slice(1)}` : d;
-};
-const instagramUrl = (v) => (v.startsWith('http') ? v : `https://instagram.com/${v.replace('@', '')}`);
+// The owner fills these in from the admin page (Settings). Anything left empty is hidden.
+// The values below are only a fallback.
+const FALLBACK = { phone: '', whatsapp: '', instagram: '', facebook: '', tiktok: '', address: '', mapQuery: '' };
 
 function ContactPage() {
-  const { whatsapp, instagram, mapQuery } = CONTACT;
-  const empty = !whatsapp && !instagram && !mapQuery;
+  const { t } = useI18n();
+  const settings = useSiteSettings();
+  const c = { ...FALLBACK, ...Object.fromEntries(Object.entries(settings.contact || {}).filter(([, v]) => v)) };
+  const socials = [
+    [c.instagram, 'instagram', InstagramIcon, t('contact.instagramBtn')],
+    [c.facebook, 'facebook', FacebookIcon, t('contact.facebookBtn')],
+    [c.tiktok, 'tiktok', TikTokIcon, t('contact.tiktokBtn')],
+  ].filter(([v]) => v);
+  const hasDetails = c.phone || c.whatsapp || c.address || socials.length > 0;
+  const empty = !hasDetails && !c.mapQuery;
 
   return (
-    <div className="container py-5" style={{ maxWidth: 960 }}>
-      <h2 className="section-heading mb-0">Contact</h2>
+    <div className="container py-5" style={{ maxWidth: 1000 }}>
+      <h2 className="section-heading mb-0">{t('contact.title')}</h2>
       <hr className="gold-rule" />
-      {empty && <p className="text-center text-muted">Contact details coming soon.</p>}
+      {empty && <p className="text-center text-muted">{t('contact.soon')}</p>}
 
       <div className="row g-4 align-items-stretch">
-        {(whatsapp || instagram) && (
-          <div className="col-lg-5">
-            <Reveal>
+        {hasDetails && (
+          <div className={c.mapQuery ? 'col-lg-5' : 'col-12'}>
+            <Reveal className="h-100">
               <div className="contact-panel">
-                {whatsapp && (
-                  <div className="mb-4">
-                    <span className="pd-label d-block">WhatsApp</span>
-                    <div className="mb-3">{whatsapp}</div>
-                    <a className="btn btn-outline-gold" href={`https://wa.me/${whatsappDigits(whatsapp)}`} target="_blank" rel="noreferrer">
-                      Chat on WhatsApp
-                    </a>
+                {c.phone && (
+                  <div className="contact-item">
+                    <span className="contact-ico"><PhoneIcon /></span>
+                    <div>
+                      <span className="pd-label d-block">{t('contact.phone')}</span>
+                      <a className="contact-number" href={`tel:${c.phone.replace(/\s/g, '')}`} dir="ltr">{c.phone}</a>
+                    </div>
                   </div>
                 )}
-                {instagram && (
-                  <div>
-                    <span className="pd-label d-block">Instagram</span>
-                    <div className="mb-3">{instagram.startsWith('http') ? 'Our Instagram page' : `@${instagram.replace('@', '')}`}</div>
-                    <a className="btn btn-outline-gold" href={instagramUrl(instagram)} target="_blank" rel="noreferrer">
-                      Visit our Instagram
-                    </a>
+                {c.whatsapp && (
+                  <div className="contact-item">
+                    <span className="contact-ico"><WhatsAppIcon /></span>
+                    <div>
+                      <span className="pd-label d-block">{t('contact.whatsappLabel')}</span>
+                      <div className="contact-number" dir="ltr">{c.whatsapp}</div>
+                      <a className="btn btn-outline-gold mt-2" href={socialUrl.whatsapp(c.whatsapp)} target="_blank" rel="noreferrer">{t('contact.whatsappBtn')}</a>
+                    </div>
+                  </div>
+                )}
+                {c.address && (
+                  <div className="contact-item">
+                    <span className="contact-ico"><PinIcon /></span>
+                    <div><span className="pd-label d-block">{t('contact.address')}</span>{c.address}</div>
+                  </div>
+                )}
+                {socials.length > 0 && (
+                  <div className="contact-item">
+                    <div className="w-100">
+                      <span className="pd-label d-block">{t('contact.social')}</span>
+                      <div className="contact-socials">
+                        {socials.map(([v, key, Icon, label]) => (
+                          <a key={key} className="contact-social" href={socialUrl[key](v)} target="_blank" rel="noreferrer"><Icon /> {label}</a>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
             </Reveal>
           </div>
         )}
-        {mapQuery && (
-          <div className={whatsapp || instagram ? 'col-lg-7' : 'col-12'}>
+        {c.mapQuery && (
+          <div className={hasDetails ? 'col-lg-7' : 'col-12'}>
             <Reveal className="h-100">
               <div className="map-frame">
-                <iframe
-                  title="Our location"
-                  src={`https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`}
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  allowFullScreen
-                />
+                <iframe title={t('contact.mapTitle')} src={`https://www.google.com/maps?q=${encodeURIComponent(c.mapQuery)}&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
               </div>
               <div className="text-center mt-2">
-                <a className="small" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`} target="_blank" rel="noreferrer">
-                  Open in Google Maps
-                </a>
+                <a className="small" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.mapQuery)}`} target="_blank" rel="noreferrer">{t('contact.openMap')}</a>
               </div>
             </Reveal>
           </div>

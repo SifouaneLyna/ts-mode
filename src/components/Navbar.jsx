@@ -3,6 +3,10 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getLeafCategories } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useI18n } from '../i18n/I18nContext';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useSiteSettings } from '../context/SiteSettingsContext';
+import { loc } from '../utils/localize';
 
 function UserIcon() {
   return (
@@ -14,7 +18,10 @@ function UserIcon() {
 }
 
 function AnnouncementBar({ hidden }) {
-  const items = ['NOUVELLE COLLECTION', 'PAIEMENT À LA LIVRAISON', 'TS MODE'];
+  const { t, lang } = useI18n();
+  const settings = useSiteSettings();
+  const custom = (settings.announcements || []).map((a) => a[lang] || a.en || a.fr || a.ar).filter(Boolean);
+  const items = custom.length ? custom : [t('announce.1'), t('announce.2'), t('announce.3')];
   const group = Array.from({ length: 6 }, (_, i) => items[i % items.length]);
   return (
     <div className={`announce ${hidden ? 'is-hidden' : ''}`}>
@@ -30,6 +37,7 @@ function AnnouncementBar({ hidden }) {
 }
 
 function SearchForm({ className }) {
+  const { t } = useI18n();
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
 
@@ -41,8 +49,8 @@ function SearchForm({ className }) {
 
   return (
     <form className={`nav-search ${className}`} onSubmit={handleSubmit} role="search">
-      <input type="search" placeholder="Search" value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search products" />
-      <button type="submit" aria-label="Search">
+      <input type="search" placeholder={t('nav.search')} value={query} onChange={(e) => setQuery(e.target.value)} aria-label={t('nav.search')} />
+      <button type="submit" aria-label={t('nav.search')}>
         <svg width="20" height="20" viewBox="0 0 24 24"><use href="#search"></use></svg>
       </button>
     </form>
@@ -53,7 +61,9 @@ function Navbar() {
   const [leafCategories, setLeafCategories] = useState([]);
   const { totalItems } = useCart();
   const { user } = useAuth();
+  const { t, lang } = useI18n();
   const { pathname, search } = useLocation();
+  const isStaff = user && ['owner', 'staff'].includes(user.role);
   const isHome = pathname === '/';
   const [scrolled, setScrolled] = useState(false);
 
@@ -88,36 +98,39 @@ function Navbar() {
 
           <div className="offcanvas offcanvas-end" tabIndex="-1" id="offcanvasNavbar">
             <div className="offcanvas-header">
-              <h5 className="offcanvas-title">Menu</h5>
+              <h5 className="offcanvas-title">{t('nav.menu')}</h5>
               <button type="button" className="btn-close" data-bs-dismiss="offcanvas"></button>
             </div>
             <div className="offcanvas-body">
               <ul className="navbar-nav justify-content-center flex-grow-1 gap-1 gap-lg-5">
                 <li className="nav-item">
-                  <Link className={`nav-link ${isHome ? 'active-link' : ''}`} to="/">Home</Link>
+                  <Link className={`nav-link ${isHome ? 'active-link' : ''}`} to="/">{t('nav.home')}</Link>
                 </li>
                 <li className="nav-item dropdown nav-shop">
-                  <Link className={`nav-link ${pathname === '/products' ? 'active-link' : ''}`} to="/products">Shop</Link>
+                  <Link className={`nav-link ${pathname === '/products' ? 'active-link' : ''}`} to="/products">{t('nav.shop')}</Link>
                   <ul className="dropdown-menu list-unstyled">
                     {leafCategories.map((cat) => (
                       <li key={cat._id}>
                         <Link to={`/products?category=${cat._id}`} className="dropdown-item item-anchor">
-                          {cat.name}
+                          {loc(cat, 'name', lang)}
                         </Link>
                       </li>
                     ))}
                   </ul>
                 </li>
                 <li className="nav-item">
-                  <Link className={`nav-link ${pathname === '/about' ? 'active-link' : ''}`} to="/about">About</Link>
+                  <Link className={`nav-link ${pathname === '/about' ? 'active-link' : ''}`} to="/about">{t('nav.about')}</Link>
                 </li>
                 <li className="nav-item">
-                  <Link className={`nav-link ${pathname === '/contact' ? 'active-link' : ''}`} to="/contact">Contact</Link>
+                  <Link className={`nav-link ${pathname === '/contact' ? 'active-link' : ''}`} to="/contact">{t('nav.contact')}</Link>
                 </li>
                 <li className="nav-item d-lg-none">
-                  <Link className="nav-link" to={user ? '/profile' : '/login'}>
-                    {user ? 'Profile' : 'Login'}
+                  <Link className="nav-link" to={isStaff ? '/admin' : user ? '/profile' : '/login'}>
+                    {user ? t('nav.profile') : t('nav.login')}
                   </Link>
+                </li>
+                <li className="nav-item d-lg-none">
+                  <LanguageSwitcher className="mt-3" />
                 </li>
               </ul>
             </div>
@@ -125,14 +138,15 @@ function Navbar() {
 
           <div className="nav-actions d-flex align-items-center ms-auto ms-lg-0">
             <SearchForm className="me-2 me-lg-3" />
-            <Link to="/cart" className="nav-icon position-relative" aria-label="Cart">
+            <Link to="/cart" className="nav-icon position-relative" aria-label={t('nav.cart')}>
               <svg width="24" height="24" viewBox="0 0 24 24"><use href="#cart"></use></svg>
               {totalItems > 0 && <span className="cart-badge">{totalItems}</span>}
             </Link>
-            <Link to={user ? '/profile' : '/login'} className="nav-icon d-none d-lg-block ms-3" aria-label="Profile">
+            <Link to={isStaff ? '/admin' : user ? '/profile' : '/login'} className="nav-icon d-none d-lg-block ms-3" aria-label={t('nav.profile')}>
               <UserIcon />
             </Link>
-            <button className="navbar-toggler d-lg-none ms-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-label="Menu">
+            <LanguageSwitcher className="d-none d-lg-flex ms-3" />
+            <button className="navbar-toggler d-lg-none ms-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-label={t('nav.menu')}>
               <span className="navbar-toggler-icon"></span>
             </button>
           </div>

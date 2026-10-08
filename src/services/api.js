@@ -56,7 +56,7 @@ export async function getLeafCategories() {
 }
 
 
-async function request(path, { method = "GET", body, token } = {}) {
+export async function request(path, { method = "GET", body, token } = {}) {
   const headers = { "x-site-subdomain": SITE_SUBDOMAIN };
   if (body) headers["Content-Type"] = "application/json";
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -86,3 +86,5 @@ export const updateMe = (body, token) => request("/auth/me", { method: "PATCH", 
 export const cancelMyOrder = (id, token) => request(`/orders/${id}/cancel`, { method: "PATCH", token });
 export const trackOrder = (body) => request("/orders/track", { method: "POST", body });
 export const cancelTrackedOrder = (body) => request("/orders/track/cancel", { method: "POST", body });
+export const getSettings = () => request("/site-settings");
+export { API_BASE_URL, SITE_SUBDOMAIN };
