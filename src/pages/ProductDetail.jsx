@@ -129,7 +129,7 @@ function ProductDetail() {
 
           <div className="d-flex flex-column flex-sm-row gap-2">
             {!soldOut && (
-              <button className="btn btn-gold-solid flex-fill" disabled={!canAddToCart} onClick={() => handleAddToCart(true)}>
+              <button className="btn btn-outline-gold flex-fill" disabled={!canAddToCart} onClick={() => handleAddToCart(true)}>
                 {t('pd.buyNow')}
               </button>
             )}

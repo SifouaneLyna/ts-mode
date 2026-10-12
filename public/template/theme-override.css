@@ -1753,3 +1753,47 @@ body {
   overflow-x: hidden;
   overflow-x: clip;
 }
+
+/* ===== Show whole pictures: never cropped, on any screen ===== */
+.pcard-media {
+  aspect-ratio: 3 / 4;
+  background: #f6f1e7;
+}
+.pcard-media img {
+  object-fit: contain !important;
+}
+.pcard:hover .pcard-media img {
+  transform: scale(1.03);
+}
+.pd-image {
+  width: 100%;
+  height: auto;
+  max-height: 85vh;
+  aspect-ratio: auto;
+  object-fit: contain;
+  background: #f6f1e7;
+}
+@media (max-width: 767.98px) {
+  .pd-image {
+    width: min(100%, 340px);
+    max-height: none;
+  }
+}
+.pd-thumbs img,
+.cart-row > img {
+  object-fit: contain;
+  background: #f6f1e7;
+}
+.cat-card-img {
+  background-size: contain !important;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: #f6f1e7;
+}
+
+/* ===== Phones: no "add to cart" button on product cards (tap the card to open the product) ===== */
+@media (max-width: 767.98px), (hover: none) {
+  .pcard-add {
+    display: none !important;
+  }
+}

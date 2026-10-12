@@ -1513,3 +1513,9 @@ details.adm-opt[open] > summary::before {
 .adm-menu[open] {
   z-index: 30;
 }
+
+.adm-prodcell img,
+.adm-thumb img {
+  object-fit: contain;
+  background: #f6f1e7;
+}
