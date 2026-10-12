@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getProductById } from '../services/api';
 import { useCart } from '../context/CartContext';
 import QuantityInput from '../components/QuantityInput';
@@ -17,6 +17,7 @@ function ProductDetail() {
   const [added, setAdded] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const { addToCart } = useCart();
+  const navigate = useNavigate();
   const { t, money, lang } = useI18n();
   const attr = useAttr();
 
@@ -57,9 +58,9 @@ function ProductDetail() {
     ? (matchedVariant?.stockQty ?? 0)
     : product.stockQty;
 
-  function handleAddToCart() {
-    // the cart keeps the values exactly as stored on the variant (the server matches on them)
+  function handleAddToCart(goToCheckout = false) {
     addToCart(product, product.hasVariants ? { ...matchedVariant.attributes } : {}, Math.min(quantity, availableStock), finalPrice);
+    if (goToCheckout === true) { navigate('/checkout', { state: { guest: true } }); return; }
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }
@@ -75,7 +76,7 @@ function ProductDetail() {
 
   return (
     <div className="container py-5">
-      <div className="row g-5">
+      <div className="row gy-5 gx-3 gx-md-5">
         <div className="col-md-6">
           <img src={img(mainImage, 1400, 'best')} alt={loc(product, 'name', lang)} className="pd-image" decoding="async" />
           {gallery.length > 1 && (
@@ -126,9 +127,16 @@ function ProductDetail() {
             <QuantityInput value={quantity} onChange={setQuantity} max={availableStock > 0 ? availableStock : undefined} />
           </div>
 
-          <button className={`btn btn-outline-gold w-100 ${soldOut ? 'is-soldout' : ''}`} disabled={!canAddToCart} onClick={handleAddToCart}>
-            {added ? t('pd.added') : product.hasVariants && !allAttributesSelected ? t('pd.selectOptions') : soldOut ? t('pd.outOfStock') : t('pd.add')}
-          </button>
+          <div className="d-flex flex-column flex-sm-row gap-2">
+            {!soldOut && (
+              <button className="btn btn-gold-solid flex-fill" disabled={!canAddToCart} onClick={() => handleAddToCart(true)}>
+                {t('pd.buyNow')}
+              </button>
+            )}
+            <button className={`btn btn-outline-gold flex-fill ${soldOut ? 'is-soldout' : ''}`} disabled={!canAddToCart} onClick={() => handleAddToCart()}>
+              {added ? t('pd.added') : product.hasVariants && !allAttributesSelected ? t('pd.selectOptions') : soldOut ? t('pd.outOfStock') : t('pd.add')}
+            </button>
+          </div>
         </div>
       </div>
     </div>

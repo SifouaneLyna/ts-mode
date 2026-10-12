@@ -123,7 +123,7 @@ function CheckoutPage() {
     <div className="container py-5">
       <h2 className="section-heading mb-0">{t('checkout.title')}</h2>
       <hr className="gold-rule" />
-      <div className="row g-5">
+      <div className="row gy-5 gx-3 gx-md-5">
         <form className="col-lg-7" onSubmit={handleSubmit}>
           <input className="form-control mb-3" placeholder={t('checkout.fullName')} value={form.name} onChange={set('name')} required />
           <input className={`form-control ${phoneTouched && phoneError ? 'is-invalid' : 'mb-3'}`} placeholder={t('checkout.phonePh')} inputMode="tel" value={form.phone}

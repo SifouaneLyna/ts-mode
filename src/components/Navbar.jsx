@@ -124,6 +124,9 @@ function Navbar() {
                 <li className="nav-item">
                   <Link className={`nav-link ${pathname === '/contact' ? 'active-link' : ''}`} to="/contact">{t('nav.contact')}</Link>
                 </li>
+                <li className="nav-item">
+                  <Link className={`nav-link ${pathname === '/track' ? 'active-link' : ''}`} to="/track">{t('nav.track')}</Link>
+                </li>
                 <li className="nav-item d-lg-none">
                   <Link className="nav-link" to={isStaff ? '/admin' : user ? '/profile' : '/login'}>
                     {user ? t('nav.profile') : t('nav.login')}
