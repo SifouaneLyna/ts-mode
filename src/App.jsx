@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
@@ -30,6 +31,9 @@ import AdminSettings from './admin/pages/Settings';
 
 function AnimatedRoutes() {
   const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [pathname]);
   return (
     <div key={pathname} className={`page-fade ${pathname.startsWith('/admin') ? 'is-admin' : ''}`}>
       <Routes>

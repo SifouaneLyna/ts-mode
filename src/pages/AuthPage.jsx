@@ -57,7 +57,7 @@ function AuthPage({ mode }) {
           <>
             <Field label={t('auth.fullName')} autoComplete="name" {...field('name')} />
             <Field label={t('auth.username')} autoComplete="username" {...field('username')} />
-            <Field label={t('auth.phone')} inputMode="tel" autoComplete="tel" placeholder="0555 12 34 56" {...field('phone')} />
+            <Field label={t('auth.phone')} inputMode="tel" autoComplete="tel" {...field('phone')} />
           </>
         ) : (
           <Field label={t('auth.identifier')} autoComplete="username" {...field('identifier')} />

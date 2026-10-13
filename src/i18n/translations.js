@@ -190,11 +190,7 @@ const T = {
     fr: "Nom complet",
     ar: "الاسم الكامل",
   },
-  "checkout.phonePh": {
-    en: "Phone (0555 12 34 56)",
-    fr: "Téléphone (0555 12 34 56)",
-    ar: "الهاتف (0555 12 34 56)",
-  },
+  "checkout.phonePh": { en: "Phone", fr: "Téléphone", ar: "الهاتف" },
   "checkout.wilaya": { en: "Wilaya", fr: "Wilaya", ar: "الولاية" },
   "checkout.city": { en: "City", fr: "Commune", ar: "البلدية" },
   "checkout.address": { en: "Address", fr: "Adresse", ar: "العنوان" },

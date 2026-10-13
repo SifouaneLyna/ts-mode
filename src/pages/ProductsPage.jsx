@@ -49,7 +49,7 @@ function ProductsPage() {
         </p>
       )}
       <div className="row">
-        <div className="col-md-3 mb-4">
+        <div className="col-md-3 mb-4" hidden={categories.length === 0}>
           <h6 className="text-uppercase mb-3">{t('products.categories')}</h6>
           <ul className="list-unstyled">
             <li className="mb-2">

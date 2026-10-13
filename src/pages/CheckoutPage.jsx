@@ -166,7 +166,6 @@ function CheckoutPage() {
           <div className="d-flex justify-content-between fw-bold mt-2">
             <span>{t('cart.total')}</span><span>{deliveryPrice === null ? '—' : money(totalPrice + deliveryPrice)}</span>
           </div>
-          <p className="small text-muted mt-3">{t('checkout.serverNote')}</p>
         </aside>
       </div>
     </div>

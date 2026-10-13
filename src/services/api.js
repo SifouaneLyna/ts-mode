@@ -52,9 +52,8 @@ export async function getLeafCategories() {
   const all = await res.json();
 
   const parentIds = new Set(all.map((c) => c.parentCategoryId).filter(Boolean));
-  return all.filter((c) => !parentIds.has(c._id));
+  return all.filter((c) => c.parentCategoryId && !parentIds.has(c._id));
 }
-
 
 export async function request(path, { method = "GET", body, token } = {}) {
   const headers = { "x-site-subdomain": SITE_SUBDOMAIN };
@@ -75,16 +74,21 @@ export async function request(path, { method = "GET", body, token } = {}) {
   return data;
 }
 
-export const signup = (body) => request("/auth/signup", { method: "POST", body });
+export const signup = (body) =>
+  request("/auth/signup", { method: "POST", body });
 export const login = (body) => request("/auth/login", { method: "POST", body });
 export const getDeliveryRates = () => request("/delivery-rates");
 export const createOrder = (body, token) =>
   request("/orders", { method: "POST", body, token });
 export const getMyOrders = (token) => request("/orders/mine", { token });
 export const getMe = (token) => request("/auth/me", { token });
-export const updateMe = (body, token) => request("/auth/me", { method: "PATCH", body, token });
-export const cancelMyOrder = (id, token) => request(`/orders/${id}/cancel`, { method: "PATCH", token });
-export const trackOrder = (body) => request("/orders/track", { method: "POST", body });
-export const cancelTrackedOrder = (body) => request("/orders/track/cancel", { method: "POST", body });
+export const updateMe = (body, token) =>
+  request("/auth/me", { method: "PATCH", body, token });
+export const cancelMyOrder = (id, token) =>
+  request(`/orders/${id}/cancel`, { method: "PATCH", token });
+export const trackOrder = (body) =>
+  request("/orders/track", { method: "POST", body });
+export const cancelTrackedOrder = (body) =>
+  request("/orders/track/cancel", { method: "POST", body });
 export const getSettings = () => request("/site-settings");
 export { API_BASE_URL, SITE_SUBDOMAIN };

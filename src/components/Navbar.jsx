@@ -108,7 +108,7 @@ function Navbar() {
                 </li>
                 <li className="nav-item dropdown nav-shop">
                   <Link className={`nav-link ${pathname === '/products' ? 'active-link' : ''}`} to="/products">{t('nav.shop')}</Link>
-                  <ul className="dropdown-menu list-unstyled">
+                  <ul className="dropdown-menu list-unstyled" hidden={leafCategories.length === 0}>
                     {leafCategories.map((cat) => (
                       <li key={cat._id}>
                         <Link to={`/products?category=${cat._id}`} className="dropdown-item item-anchor">
