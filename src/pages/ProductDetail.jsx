@@ -7,6 +7,7 @@ import { img } from '../utils/img';
 import { loc } from '../utils/localize';
 import { useI18n } from '../i18n/I18nContext';
 import { useAttr } from '../context/SiteSettingsContext';
+import { track } from '../utils/pixel';
 
 function ProductDetail() {
   const { productId } = useParams();
@@ -27,6 +28,12 @@ function ProductDetail() {
       .catch(err => console.error(err))
       .finally(() => setLoading(false));
   }, [productId]);
+
+  useEffect(() => {
+    if (!product) return;
+    const price = product.onSale ? Math.round(product.basePrice * (1 - product.salePercentage / 100)) : product.basePrice;
+    track('ViewContent', { content_ids: [product._id], content_name: product.name, content_type: 'product', value: price, currency: 'DZD' });
+  }, [product?._id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) return <p className="container mt-5">{t('common.loading')}</p>;
   if (!product) return <p className="container mt-5">{t('pd.notFound')}</p>;
@@ -60,6 +67,7 @@ function ProductDetail() {
 
   function handleAddToCart(goToCheckout = false) {
     addToCart(product, product.hasVariants ? { ...matchedVariant.attributes } : {}, Math.min(quantity, availableStock), finalPrice);
+      track('AddToCart', { content_ids: [product._id], content_name: product.name, content_type: 'product', value: finalPrice * Math.min(quantity, availableStock), currency: 'DZD' });
     if (goToCheckout === true) { navigate('/checkout', { state: { guest: true } }); return; }
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);

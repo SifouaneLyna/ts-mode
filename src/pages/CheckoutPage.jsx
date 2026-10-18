@@ -8,6 +8,7 @@ import { saveGuestOrder } from '../utils/guestOrders';
 import { useI18n } from '../i18n/I18nContext';
 import { useAttr } from '../context/SiteSettingsContext';
 import { loc } from '../utils/localize';
+import { track } from '../utils/pixel';
 
 function CheckoutPage() {
   const { token, user, logout } = useAuth();
@@ -29,6 +30,10 @@ function CheckoutPage() {
   useEffect(() => {
     getDeliveryRates().then(setRates).catch(() => setError('__rates'));
   }, []);
+  
+  useEffect(() => {
+    if (items.length) track('InitiateCheckout', { value: totalPrice, currency: 'DZD', num_items: items.length });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (order) {
     return (
@@ -107,6 +112,7 @@ function CheckoutPage() {
       if (!token) saveGuestOrder({ orderNumber: created.orderNumber, phone: cleanPhone(form.phone) });
       clearCart();
       setOrder(created);
+      track('Purchase', { value: created.totalPrice, currency: 'DZD', content_type: 'product', content_ids: items.map((i) => i.productId), num_items: items.length });
     } catch (err) {
       if (err.status === 401 && token) {
         logout();
