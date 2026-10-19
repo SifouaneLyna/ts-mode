@@ -36,6 +36,7 @@ function AnimatedRoutes() {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     if (firstRun.current) { firstRun.current = false; return; }
     if (!pathname.startsWith('/admin') && window.fbq) window.fbq('track', 'PageView');
+    if (!pathname.startsWith('/admin') && window.ttq) window.ttq.page();
   }, [pathname]);
   return (
     <div key={pathname} className={`page-fade ${pathname.startsWith('/admin') ? 'is-admin' : ''}`}>
