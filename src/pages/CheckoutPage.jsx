@@ -102,7 +102,7 @@ function CheckoutPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
-    if (phoneError) { setPhoneTouched(true); return; }
+    if (phoneError) { setPhoneTouched(true); setError(phoneError); return; }
     setLoading(true);
     try {
       const created = await createOrder({
@@ -130,7 +130,7 @@ function CheckoutPage() {
       <h2 className="section-heading mb-0">{t('checkout.title')}</h2>
       <hr className="gold-rule" />
       <div className="row gy-5 gx-3 gx-md-5">
-        <form className="col-lg-7" onSubmit={handleSubmit}>
+        <form id="checkout-form" className="col-lg-7" onSubmit={handleSubmit}>
           <input className="form-control mb-3" placeholder={t('checkout.fullName')} value={form.name} onChange={set('name')} required />
           <input className={`form-control ${phoneTouched && phoneError ? 'is-invalid' : 'mb-3'}`} placeholder={t('checkout.phonePh')} inputMode="tel" value={form.phone}
             onChange={set('phone')} onBlur={() => setPhoneTouched(true)} required />
@@ -152,12 +152,11 @@ function CheckoutPage() {
           {form.deliveryType === 'home' && (
             <input className="form-control mb-3" placeholder={t('checkout.address')} value={form.address} onChange={set('address')} required />
           )}
-          {error && <div className="alert alert-danger py-2">{error === '__rates' ? t('checkout.ratesError') : errorText(error)}</div>}
-          <button className="btn btn-outline-gold" disabled={loading || deliveryPrice === null}>
+          {error && <div className="alert alert-danger py-2 d-none d-lg-block">{error === '__rates' ? t('checkout.ratesError') : errorText(error)}</div>}
+          <button className="btn btn-outline-gold d-none d-lg-inline-block" disabled={loading || deliveryPrice === null}>
             {loading ? t('checkout.placing') : t('checkout.place')}
           </button>
         </form>
-
         <aside className="col-lg-5">
           <h5 className="text-uppercase mb-3">{t('checkout.summary')}</h5>
           {items.map((i, idx) => (
@@ -172,6 +171,12 @@ function CheckoutPage() {
           <div className="d-flex justify-content-between fw-bold mt-2">
             <span>{t('cart.total')}</span><span>{deliveryPrice === null ? '—' : money(totalPrice + deliveryPrice)}</span>
           </div>
+
+                    <p className="small fw-bold mt-3 mb-2 d-lg-none" style={{ color: '#633e15' }}>{t('checkout.deliveryTime')}</p>
+          {error && <div className="alert alert-danger py-2 d-lg-none">{error === '__rates' ? t('checkout.ratesError') : errorText(error)}</div>}
+          <button type="submit" form="checkout-form" className="btn btn-outline-gold w-100 d-lg-none" disabled={loading || deliveryPrice === null}>
+            {loading ? t('checkout.placing') : t('checkout.place')}
+          </button>
         </aside>
       </div>
     </div>

@@ -8,6 +8,7 @@ import ImageUploader from '../components/ImageUploader';
 import ChipsInput from '../components/ChipsInput';
 import { BUILTIN, SIZE_SUGGESTIONS, isColorName, isSizeName, isUniversalWord, normalize } from '../../utils/attributes';
 import { comboKey, combinations, optionsFromVariants, variantsFromOptions } from '../optionsModel';
+import HighlightsEditor, { blocksForSave, blocksFromProduct } from '../components/HighlightsEditor';
 
 const LANGS = [['en', 'a.langEn'], ['fr', 'a.langFr'], ['ar', 'a.langAr']];
 const emptyTexts = () => ({ en: { name: '', description: '' }, fr: { name: '', description: '' }, ar: { name: '', description: '' } });
@@ -25,8 +26,7 @@ function ProductForm() {
   const [loaded, setLoaded] = useState(!id);
   const [saving, setSaving] = useState(false);
   const [tab, setTab] = useState(lang);
-  const [f, setF] = useState({ texts: emptyTexts(), basePrice: '', categoryId: '', images: [], onSale: false, salePercentage: '', isVisible: true, stockQty: '0' });
-  const [kind, setKind] = useState('simple'); // simple | options
+  const [f, setF] = useState({ texts: emptyTexts(), basePrice: '', categoryId: '', images: [], onSale: false, salePercentage: '', isVisible: true, stockQty: '0', highlights: [] });  const [kind, setKind] = useState('simple'); // simple | options
   const [options, setOptions] = useState([]);
   const [stock, setStock] = useState({});
   const [colorImages, setColorImages] = useState({});
@@ -44,7 +44,7 @@ function ProductForm() {
       for (const l of ['en', 'fr', 'ar']) texts[l] = { name: p.translations?.[l]?.name || '', description: p.translations?.[l]?.description || '' };
       // old products have one text only: show it in the language you are using
       if (!texts.en.name && !texts.fr.name && !texts.ar.name) texts[lang] = { name: p.name || '', description: p.description || '' };
-      setF({ texts, basePrice: String(p.basePrice), categoryId: p.categoryId || '', images: p.images || [], onSale: p.onSale, salePercentage: String(p.salePercentage || ''), isVisible: p.isVisible, stockQty: String(p.stockQty || 0) });
+      setF({ texts, basePrice: String(p.basePrice), categoryId: p.categoryId || '', images: p.images || [], onSale: p.onSale, salePercentage: String(p.salePercentage || ''), isVisible: p.isVisible, stockQty: String(p.stockQty || 0), highlights: blocksFromProduct(p.highlights, lang) });
       if (p.hasVariants) {
         const m = optionsFromVariants(p.variants || [], (w) => attr.canonical(w), (n) => (attr.known(n) ? attr.canonical(n).toLowerCase() : n));
         setKind('options'); setOptions(m.options); setStock(m.stock); setColorImages(m.colorImages);
@@ -112,7 +112,7 @@ function ProductForm() {
     const body = {
       name, description, translations: f.texts, basePrice: Number(f.basePrice), categoryId: f.categoryId || null, images: f.images,
       onSale: f.onSale, salePercentage: f.onSale ? Number(f.salePercentage) || 0 : 0, isVisible: f.isVisible,
-      hasVariants: withOptions, stockQty: withOptions ? 0 : Number(f.stockQty) || 0,
+      highlights: blocksForSave(f.highlights), hasVariants: withOptions, stockQty: withOptions ? 0 : Number(f.stockQty) || 0,
       variants: withOptions ? variantsFromOptions(options, stock, colorImages) : [],
     };
     setSaving(true);
@@ -178,7 +178,7 @@ function ProductForm() {
             <p className="adm-muted small">{t('a.prod.imagesHint')}</p>
             <ImageUploader images={f.images} onChange={(images) => setF({ ...f, images })} />
           </section>
-
+          <HighlightsEditor blocks={f.highlights} onChange={(highlights) => setF((cur) => ({ ...cur, highlights }))} />
           <section className="adm-card">
             <h3>{t('a.pf.options')}</h3>
             <div className="adm-seg">

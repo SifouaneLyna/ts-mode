@@ -122,11 +122,35 @@ const T = {
   },
   "pd.add": { en: "Add to Cart", fr: "Ajouter au panier", ar: "أضف إلى السلة" },
   "pd.buyNow": { en: "Buy now", fr: "Acheter maintenant", ar: "اشترِ الآن" },
+  "pd.chooseHint": {
+    en: "Choose {options} to complete your order",
+    fr: "Choisissez {options} pour finaliser votre commande",
+    ar: "اختر {options} لإتمام طلبك",
+  },
+  "pd.deliveryTo": {
+    en: "Delivery cost to",
+    fr: "Frais de livraison vers",
+    ar: "تكلفة التوصيل إلى",
+  },
+  "pd.deliveryTime": { en: "", fr: "", ar: "" },
+  "pd.exchange": { en: "", fr: "", ar: "" },
   "pd.notFound": {
     en: "Product not found.",
     fr: "Produit introuvable.",
     ar: "المنتج غير موجود.",
   },
+
+  "pd.related": {
+    en: "You may also like",
+    fr: "Vous aimerez aussi",
+    ar: "قد يعجبك أيضًا",
+  },
+  "pd.soundOn": {
+    en: "Turn sound on",
+    fr: "Activer le son",
+    ar: "تشغيل الصوت",
+  },
+  "pd.soundOff": { en: "Turn sound off", fr: "Couper le son", ar: "كتم الصوت" },
 
   // ---- cart ----
   "cart.title": { en: "Your Cart", fr: "Votre panier", ar: "سلّتك" },
@@ -208,6 +232,11 @@ const T = {
     en: "Place order (cash on delivery)",
     fr: "Passer la commande (paiement à la livraison)",
     ar: "تأكيد الطلب (الدفع عند الاستلام)",
+  },
+  "checkout.deliveryTime": {
+    en: "Delivery can take 48 to 72 hours.",
+    fr: "La livraison peut prendre de 48 à 72 heures.",
+    ar: "قد يستغرق التوصيل من 48 إلى 72 ساعة.",
   },
   "checkout.placing": {
     en: "Placing order…",
