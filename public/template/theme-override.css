@@ -2273,11 +2273,12 @@ body {
 .related {
   --pd-gap: clamp(0.75rem, 2vw, 1.25rem);
 }
-.hl {
-  margin-top: var(--pd-gap);
-}
+.hl,
 .related {
   margin-top: var(--pd-gap);
+  /* beats the global "section { padding: 2.5rem !important }" that created the big gaps */
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
 .related .gold-rule {
   margin-top: 0.6rem;
@@ -2310,51 +2311,77 @@ body {
   line-height: 1;
 }
 
-.hl-row {
+.hl-list {
   display: grid;
   grid-template-columns: 1fr;
+  /* every row is as tall as the tallest block, so all blocks have exactly the same size
+     and the longest text always fits */
+  grid-auto-rows: 1fr;
+  gap: var(--pd-gap);
+}
+.hl-item {
+  display: flex;
+  min-width: 0;
+}
+
+/* One block = title, then picture / video, then text, all centered */
+.hl-card {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1.1rem;
-  margin-bottom: var(--pd-gap);
-  padding: clamp(0.75rem, 2vw, 1.25rem);
+  justify-content: center;
+  text-align: center;
+  padding: clamp(0.9rem, 2vw, 1.5rem) clamp(0.6rem, 1.5vw, 1.1rem);
   background: #fffaf0;
   border: 1px solid rgba(200, 155, 72, 0.35);
   border-radius: 18px;
   box-shadow: 0 10px 28px rgba(99, 62, 21, 0.07);
 }
-.hl-row:last-child {
-  margin-bottom: 0;
+
+/* 1. Title */
+.hl-title {
+  width: 100%;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  line-height: 1.25;
+  margin: 0;
 }
-.hl-row.no-media {
-  max-width: 760px;
-  margin-inline: auto;
-  text-align: center;
+.hl-card .gold-rule {
+  position: relative;
+  flex: none;
+  overflow: visible;
+  width: 110px;
+  margin: 0.7rem auto 1.1rem !important;
+  background: linear-gradient(90deg, transparent, #c89b48, transparent);
+  animation: none;
 }
-.hl-row.no-media .gold-rule {
-  margin-inline: auto !important;
-}
-@media (min-width: 768px) {
-  .hl-row:not(.no-media) {
-    grid-template-columns: 1fr 1fr;
-    gap: clamp(1.5rem, 4vw, 3rem);
-  }
-  /* the grid follows the page direction, so this flips correctly in Arabic too */
-  .hl-row.flip .hl-reveal-media {
-    order: 2;
-  }
+.hl-card .gold-rule::after {
+  content: "✦";
+  position: absolute;
+  inset-block-start: -0.65em;
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  padding: 0 0.5rem;
+  background: #fffaf0;
+  color: #c89b48;
+  font-size: 0.85rem;
 }
 
-/* Media: rounded picture with an offset gold frame behind it */
+/* 2. Media: the same box for every picture and video, and the WHOLE picture / video is shown */
 .hl-media {
   position: relative;
-  aspect-ratio: 1 / 1;
+  flex: none;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 0 auto 1.1rem;
   border-radius: 14px;
   background: #f6ecd8;
   isolation: isolate;
 }
-@media (min-width: 768px) {
+@media (max-width: 767px) {
   .hl-media {
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 4 / 3;
   }
 }
 .hl-media::before {
@@ -2367,9 +2394,13 @@ body {
 }
 .hl-media img,
 .hl-media video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none;
+  object-fit: contain;
+  object-position: center;
   display: block;
   border-radius: 14px !important;
 }
@@ -2384,14 +2415,6 @@ body {
   border-start-start-radius: 18px;
   pointer-events: none;
   z-index: 2;
-}
-.hl-row.flip .hl-corner {
-  inset-inline-start: auto;
-  inset-inline-end: -10px;
-  border-inline-start: 0;
-  border-inline-end: 1px solid #c89b48;
-  border-start-start-radius: 0;
-  border-start-end-radius: 18px;
 }
 .hl-media.is-video::after {
   content: "";
@@ -2425,51 +2448,18 @@ body {
   transform: scale(1.06);
 }
 
-/* Text */
-.hl-text {
-  position: relative;
-  padding-block: 0.5rem;
-}
-.hl-title {
-  font-size: clamp(1.35rem, 3vw, 1.85rem);
-  line-height: 1.25;
-  margin-bottom: 0;
-}
-.hl-text .gold-rule {
-  position: relative;
-  overflow: visible;
-  width: 110px;
-  margin: 0.8rem 0 1.2rem;
-  background: linear-gradient(90deg, #c89b48, transparent);
-  animation: none;
-}
-.hl-text .gold-rule::after {
-  content: "✦";
-  position: absolute;
-  inset-block-start: -0.65em;
-  inset-inline-start: 0;
-  padding-inline-end: 0.5rem;
-  background: #fffaf0;
-  color: #c89b48;
-  font-size: 0.85rem;
-}
+/* 3. Text */
 .hl-desc {
-  margin: 0;
-  line-height: 1.85;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  font-size: clamp(0.92rem, 1.6vw, 1.05rem);
+  line-height: 1.8;
   white-space: pre-line;
+  text-align: center;
   color: #633e15;
 }
-@media (max-width: 767px) {
-  .hl-text {
-    text-align: center;
-  }
-  .hl-text .gold-rule {
-    margin-inline: auto;
-    background: linear-gradient(90deg, transparent, #c89b48, transparent);
-  }
-  .hl-text .gold-rule::after {
-    inset-inline-start: 50%;
-    transform: translateX(-50%);
-    padding: 0 0.5rem;
-  }
+.hl-card.no-media .hl-desc {
+  font-size: clamp(1rem, 1.8vw, 1.15rem);
+  line-height: 1.9;
 }
