@@ -2266,3 +2266,210 @@ body {
     width: 100%;
   }
 }
+
+/* ===== Product highlights ("More about this product") ===== */
+/* One value controls the space between the product details, the blocks and the related products */
+.hl,
+.related {
+  --pd-gap: clamp(0.75rem, 2vw, 1.25rem);
+}
+.hl {
+  margin-top: var(--pd-gap);
+}
+.related {
+  margin-top: var(--pd-gap);
+}
+.related .gold-rule {
+  margin-top: 0.6rem;
+  margin-bottom: 1.1rem;
+}
+.hl-head {
+  text-align: center;
+  margin-bottom: var(--pd-gap);
+}
+.hl-ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  color: #c89b48;
+}
+.hl-ornament::before,
+.hl-ornament::after {
+  content: "";
+  width: clamp(48px, 12vw, 110px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #c89b48);
+}
+.hl-ornament::after {
+  transform: scaleX(-1);
+}
+.hl-ornament span {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.hl-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: 1.1rem;
+  margin-bottom: var(--pd-gap);
+  padding: clamp(0.75rem, 2vw, 1.25rem);
+  background: #fffaf0;
+  border: 1px solid rgba(200, 155, 72, 0.35);
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgba(99, 62, 21, 0.07);
+}
+.hl-row:last-child {
+  margin-bottom: 0;
+}
+.hl-row.no-media {
+  max-width: 760px;
+  margin-inline: auto;
+  text-align: center;
+}
+.hl-row.no-media .gold-rule {
+  margin-inline: auto !important;
+}
+@media (min-width: 768px) {
+  .hl-row:not(.no-media) {
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.5rem, 4vw, 3rem);
+  }
+  /* the grid follows the page direction, so this flips correctly in Arabic too */
+  .hl-row.flip .hl-reveal-media {
+    order: 2;
+  }
+}
+
+/* Media: rounded picture with an offset gold frame behind it */
+.hl-media {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  background: #f6ecd8;
+  isolation: isolate;
+}
+@media (min-width: 768px) {
+  .hl-media {
+    aspect-ratio: 4 / 5;
+  }
+}
+.hl-media::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  box-shadow: 0 14px 30px rgba(99, 62, 21, 0.18);
+  z-index: -1;
+}
+.hl-media img,
+.hl-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 14px !important;
+}
+.hl-corner {
+  position: absolute;
+  inset-block-start: -10px;
+  inset-inline-start: -10px;
+  width: 44%;
+  height: 44%;
+  border-block-start: 1px solid #c89b48;
+  border-inline-start: 1px solid #c89b48;
+  border-start-start-radius: 18px;
+  pointer-events: none;
+  z-index: 2;
+}
+.hl-row.flip .hl-corner {
+  inset-inline-start: auto;
+  inset-inline-end: -10px;
+  border-inline-start: 0;
+  border-inline-end: 1px solid #c89b48;
+  border-start-start-radius: 0;
+  border-start-end-radius: 18px;
+}
+.hl-media.is-video::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1px rgba(253, 240, 166, 0.45);
+  pointer-events: none;
+}
+.hl-sound {
+  position: absolute;
+  inset-block-end: 12px;
+  inset-inline-end: 12px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50% !important;
+  border: 1px solid #c89b48;
+  background: rgba(255, 250, 240, 0.9);
+  color: #633e15;
+  font-size: 1rem;
+  cursor: pointer;
+  z-index: 3;
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+.hl-sound:hover {
+  background: #fdf0a6;
+  transform: scale(1.06);
+}
+
+/* Text */
+.hl-text {
+  position: relative;
+  padding-block: 0.5rem;
+}
+.hl-title {
+  font-size: clamp(1.35rem, 3vw, 1.85rem);
+  line-height: 1.25;
+  margin-bottom: 0;
+}
+.hl-text .gold-rule {
+  position: relative;
+  overflow: visible;
+  width: 110px;
+  margin: 0.8rem 0 1.2rem;
+  background: linear-gradient(90deg, #c89b48, transparent);
+  animation: none;
+}
+.hl-text .gold-rule::after {
+  content: "✦";
+  position: absolute;
+  inset-block-start: -0.65em;
+  inset-inline-start: 0;
+  padding-inline-end: 0.5rem;
+  background: #fffaf0;
+  color: #c89b48;
+  font-size: 0.85rem;
+}
+.hl-desc {
+  margin: 0;
+  line-height: 1.85;
+  white-space: pre-line;
+  color: #633e15;
+}
+@media (max-width: 767px) {
+  .hl-text {
+    text-align: center;
+  }
+  .hl-text .gold-rule {
+    margin-inline: auto;
+    background: linear-gradient(90deg, transparent, #c89b48, transparent);
+  }
+  .hl-text .gold-rule::after {
+    inset-inline-start: 50%;
+    transform: translateX(-50%);
+    padding: 0 0.5rem;
+  }
+}

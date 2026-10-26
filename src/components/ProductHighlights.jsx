@@ -34,17 +34,22 @@ function AutoVideo({ src, alt }) {
 // "More about this product": a list of blocks, each with a title, a description and a picture or a video.
 // The blocks alternate left / right on a computer and stack on a phone.
 function ProductHighlights({ blocks }) {
-  const { lang } = useI18n();
+  const { t, lang } = useI18n();
   const list = (blocks || []).filter((b) => b && (b.url || loc(b, 'title', lang) || loc(b, 'text', lang)));
   if (!list.length) return null;
 
   return (
-    <section className="hl" aria-label="highlights">
+    <section className="hl" aria-label={t('pd.more')}>
+      <header className="hl-head">
+        <h3 className="section-heading">{t('pd.more')}</h3>
+        <div className="hl-ornament" aria-hidden="true"><span>✦</span></div>
+      </header>
       {list.map((b, i) => {
         const title = loc(b, 'title', lang);
         const text = loc(b, 'text', lang);
         const media = b.url ? (
           <div className={`hl-media ${b.type === 'video' ? 'is-video' : ''}`}>
+            <span className="hl-corner" aria-hidden="true" />
             {b.type === 'video'
               ? <AutoVideo src={b.url} alt={title} />
               : <img src={img(b.url, 1200)} alt={title} loading="lazy" decoding="async" />}
@@ -56,7 +61,6 @@ function ProductHighlights({ blocks }) {
             {media && <Reveal className="hl-reveal-media">{media}</Reveal>}
             <Reveal delay={150} className="hl-reveal-text">
               <div className="hl-text">
-                <span className="hl-num">{String(i + 1).padStart(2, '0')}</span>
                 {title && <h3 className="hl-title">{title}</h3>}
                 <hr className="gold-rule ms-0" />
                 {text && <p className="hl-desc">{text}</p>}

@@ -145,6 +145,11 @@ const T = {
     fr: "Vous aimerez aussi",
     ar: "قد يعجبك أيضًا",
   },
+  "pd.more": {
+    en: "More about this product",
+    fr: "Plus sur ce produit",
+    ar: "المزيد عن هذا المنتج",
+  },
   "pd.soundOn": {
     en: "Turn sound on",
     fr: "Activer le son",
