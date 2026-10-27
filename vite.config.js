@@ -9,6 +9,17 @@ export default defineConfig({
   plugins: [
     react(),
     {
+      // /template/*.css are plain files copied as they are (their names never change), so browsers and
+      // Hostinger kept serving the OLD css next to the NEW javascript. A new ?v= on every build forces a fresh copy.
+      name: "version-template-css",
+      transformIndexHtml(html) {
+        return html.replace(
+          /(href="\/template\/[^"?]+\.css)"/g,
+          `$1?v=${BUILD_ID}"`,
+        );
+      },
+    },
+    {
       name: "build-version",
       closeBundle() {
         writeFileSync(
