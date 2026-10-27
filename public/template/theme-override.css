@@ -2314,8 +2314,6 @@ body {
 .hl-list {
   display: grid;
   grid-template-columns: 1fr;
-  /* every row is as tall as the tallest block, so all blocks have exactly the same size
-     and the longest text always fits */
   /* same width for every block; each block is only as tall as its own content */
   grid-auto-rows: auto;
   align-items: start;
@@ -2336,7 +2334,7 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: clamp(0.9rem, 2vw, 1.5rem) clamp(0.6rem, 1.5vw, 1.1rem);
+  padding: clamp(0.9rem, 2vw, 1.5rem) clamp(0.3rem, 1vw, 0.8rem);
   background: #fffaf0;
   border: 1px solid rgba(200, 155, 72, 0.35);
   border-radius: 18px;
@@ -2378,17 +2376,12 @@ body {
   --ratio: 1.7778;
   position: relative;
   flex: none;
-  width: min(100%, calc(min(90vh, 900px) * var(--ratio)));
+  width: min(100%, calc(min(150vh, 1400px) * var(--ratio)));
   aspect-ratio: var(--ratio);
   margin: 0 auto 1.1rem;
   border-radius: 14px;
   background: #f6ecd8;
   isolation: isolate;
-}
-@media (max-width: 767px) {
-  .hl-media {
-    aspect-ratio: 4 / 3;
-  }
 }
 .hl-media::before {
   content: "";
@@ -2405,7 +2398,7 @@ body {
   width: 100% !important;
   height: 100% !important;
   max-width: none;
-  object-fit: contain; /* never cut: the box has the file's own shape, and if it is not known yet the whole picture is still shown */
+  object-fit: contain; /* never cropped: the box has the file's own shape */
   object-position: center;
   display: block;
   border-radius: 14px !important;
@@ -2468,4 +2461,15 @@ body {
 .hl-card.no-media .hl-desc {
   font-size: clamp(1rem, 1.8vw, 1.15rem);
   line-height: 1.9;
+}
+@media (max-width: 575px) {
+  .hl-list {
+    margin-inline: calc(var(--bs-gutter-x, 1.5rem) * -0.5);
+  }
+  .hl-card {
+    padding-inline: 0.25rem;
+  }
+  .hl-desc {
+    padding-inline: 0.6rem;
+  }
 }
